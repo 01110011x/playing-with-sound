@@ -7,15 +7,16 @@ This is based off of video series by garrea01 on YouTube:
 
 @author: solace
 """
-from shared_imports import np, sd, wave
+from shared_imports import np, sd, wave, sf
 from datetime import datetime
 sample_rate: int = 48000
 
 def main():
-    pitch = 1000
-    my_sound = pure_tone(pitch)
-    sd.play(my_sound)
-    sd.wait()
+    #Create puretone and save value sent back by return function (i.e., faded_soundwave)
+    freq = 1000
+    my_sound = pure_tone(freq)
+    file_name = save_wave(my_sound, str(freq))
+    open_play(file_name)   
      
 def pure_tone(
         frequency: int,
@@ -59,17 +60,17 @@ def pure_tone(
     faded_sinewave = sinewave * envelope
     return faded_sinewave
 
-def save_wave(my_sound):
+def save_wave(my_sound, freq):
     #Convert float array (-0.5 to 0.5) to 16-bit integers (-32768 to 32767)
     audio_int16 = (my_sound * 32767).astype(np.int16)
     
     #Get current datetime and store in variable to be printed
     now = datetime.now()
     
-    file_name = str.my_sound + now.strftime("%H:%M:%S")
+    file_name = now.strftime(freq + "Hz_%H%M%S.wav")
     
     #Save using standard wave library
-    with wave.open(file_name , "wb") as wav_file:
+    with wave.open(file_name, "wb") as wav_file: # This saves correctly, but doesn't play correctly
         wav_file.setnchannels(1) # 1 = Mono, 2 = Stereo
         wav_file.setsampwidth(2) # 2 bytes = 16-bit audio
         wav_file.setframerate(sample_rate)
@@ -78,10 +79,10 @@ def save_wave(my_sound):
     print("File Saved!")
     return file_name
     
-def open_play():
+def open_play(file_name):
     file_name = file_name
     data, fs = sf.read(file_name)
-    
+    sd.play(data, fs)
     
     
     
